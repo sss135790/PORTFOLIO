@@ -4,6 +4,7 @@ import React, { useState, FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, Send, Sparkles, Check } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import emailjs from '@emailjs/browser';
 import Card3D from '../ui/Card3D';
 import Magnetic from '../ui/Magnetic';
 import NeonButton from '../ui/NeonButton';
@@ -24,44 +25,66 @@ export default function Contact() {
 
     setIsSubmitting(true);
 
-    // Simulate sending email api callback
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
+    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'your_service_id';
+    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'your_template_id';
+    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'your_public_key';
 
-      // Trigger canvas-confetti rain for that stunning premium user experience!
-      const end = Date.now() + 1.5 * 1000;
-      const colors = ['#00f2fe', '#4facfe', '#8b5cf6', '#ec4899'];
+    const templateParams = {
+      from_name: formData.name,
+      from_email: formData.email,
+      subject: formData.subject || 'Portfolio Connection',
+      message: formData.message,
+      to_name: 'Shwet Singh',
+    };
 
-      const frame = () => {
-        confetti({
-          particleCount: 4,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0, y: 0.8 },
-          colors: colors,
-        });
-        confetti({
-          particleCount: 4,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1, y: 0.8 },
-          colors: colors,
-        });
+    emailjs
+      .send(serviceId, templateId, templateParams, publicKey)
+      .then(
+        () => {
+          setIsSubmitting(false);
+          setIsSuccess(true);
 
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
+          // Trigger canvas-confetti rain for that stunning premium user experience!
+          const end = Date.now() + 1.5 * 1000;
+          const colors = ['#00f2fe', '#4facfe', '#8b5cf6', '#ec4899'];
+
+          const frame = () => {
+            confetti({
+              particleCount: 4,
+              angle: 60,
+              spread: 55,
+              origin: { x: 0, y: 0.8 },
+              colors: colors,
+            });
+            confetti({
+              particleCount: 4,
+              angle: 120,
+              spread: 55,
+              origin: { x: 1, y: 0.8 },
+              colors: colors,
+            });
+
+            if (Date.now() < end) {
+              requestAnimationFrame(frame);
+            }
+          };
+
+          frame();
+
+          // Reset form
+          setFormData({ name: '', email: '', subject: '', message: '' });
+
+          // Clear success alert after 5s
+          setTimeout(() => setIsSuccess(false), 5000);
+        },
+        (error) => {
+          setIsSubmitting(false);
+          console.error('EmailJS Send Error:', error);
+          alert(
+            'Message transmission failed. Please make sure to configure your EmailJS API keys in .env.local, or contact Shwet directly at shwetsingh32@gmail.com.'
+          );
         }
-      };
-
-      frame();
-
-      // Reset form
-      setFormData({ name: '', email: '', subject: '', message: '' });
-
-      // Clear success alert after 5s
-      setTimeout(() => setIsSuccess(false), 5000);
-    }, 1500);
+      );
   };
 
   const socialLinks = [
