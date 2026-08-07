@@ -8,6 +8,14 @@ import Skills from './components/sections/Skills';
 import Contact from './components/sections/Contact';
 
 export default function Home() {
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    window.history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="relative min-h-screen bg-[#030305] text-zinc-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-300">
       
