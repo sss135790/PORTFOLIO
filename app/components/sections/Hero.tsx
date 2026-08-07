@@ -7,10 +7,7 @@ import ParticleCanvas from '../3d/ParticleCanvas';
 import NeonButton from '../ui/NeonButton';
 
 const roles = [
-  'Software Development Engineer',
-  'Amazon SDE Intern',
-  'Competitive Programmer',
-  'Full Stack Developer',
+  'Software Development Engineer'
 ];
 
 export default function Hero() {
